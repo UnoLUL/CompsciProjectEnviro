@@ -6,34 +6,34 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class DataLoader {
-
+    // making lists to store the data for later.
     private List<Map<String, String>> data;
     private List<String> headers;
 
-    public DataLoader() {
+    public DataLoader() { //main dataloader
         this.data = new ArrayList<>();
         this.headers = new ArrayList<>();
     }
 
-    // Load CSV into memory
+    // Load CSV file into memory, then read all files into filePath
     public void loadCSV(String filePath) throws IOException {
         List<String> lines = Files.readAllLines(Paths.get(filePath));
 
         if (lines.isEmpty()) {
-            throw new IOException("CSV file is empty or cannot be read.");
+            throw new IOException("CSV file cannot be read (or is empty)");
         }
 
-        // Extract headers
+        // Extract headers from the excel documents
         headers = Arrays.asList(lines.get(0).split(","));
 
         // Load and clean each row
-        for (int i = 1; i < lines.size(); i++) {
+        for (int i = 1; i < lines.size(); i++) { // for loop that interates through a hashmap that helps with the excel document.
             String[] values = lines.get(i).split(",");
             if (values.length == headers.size()) {
                 Map<String, String> row = new HashMap<>();
-                for (int j = 0; j < headers.size(); j++) {
+                for (int j = 0; j < headers.size(); j++) { // trimming the values to make them better formatted
                     row.put(headers.get(j), values[j].trim());
-                }
+                }  // getting the headers from an array.
                 data.add(row);
             }
         }
@@ -41,7 +41,7 @@ public class DataLoader {
 
     // Get unique countries from data
     public Set<String> getCountries() {
-        Set<String> countries = new TreeSet<>();
+        Set<String> countries = new TreeSet<>(); //creates a set of countries.
         for (Map<String, String> row : data) {
             countries.add(row.get("Entity"));
         }
@@ -49,7 +49,7 @@ public class DataLoader {
     }
 
     // Filter data by a specific country
-    public List<Map<String, String>> filterByCountry(String country) {
+    public List<Map<String, String>> filterByCountry(String country) { //Filtering by country
         List<Map<String, String>> filtered = new ArrayList<>();
         for (Map<String, String> row : data) {
             if (row.get("Entity").equalsIgnoreCase(country)) {
