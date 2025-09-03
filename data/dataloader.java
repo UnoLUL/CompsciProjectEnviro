@@ -10,7 +10,7 @@ public class DataLoader {
     private List<Map<String, String>> data;
     private List<String> headers;
 
-    public DataLoader() { //main dataloader
+    public DataLoader() { //main dataloader, can be called to pull out the data from whatever type of excel doc
         this.data = new ArrayList<>();
         this.headers = new ArrayList<>();
     }
@@ -23,10 +23,10 @@ public class DataLoader {
             throw new IOException("CSV file cannot be read (or is empty)");
         }
 
-        // Extract headers from the excel documents
+        // Extract headers from the excel documents, then add a comment between each entry
         headers = Arrays.asList(lines.get(0).split(","));
 
-        // Load and clean each row
+        // Load and clean each row for use
         for (int i = 1; i < lines.size(); i++) { // for loop that interates through a hashmap that helps with the excel document.
             String[] values = lines.get(i).split(",");
             if (values.length == headers.size()) {
@@ -34,7 +34,7 @@ public class DataLoader {
                 for (int j = 0; j < headers.size(); j++) { // trimming the values to make them better formatted
                     row.put(headers.get(j), values[j].trim());
                 }  // getting the headers from an array.
-                data.add(row);
+                data.add(row); 
             }
         }
     }
@@ -64,7 +64,7 @@ public class DataLoader {
         return data;
     }
 
-    // Get headers
+    // pull headers from the list
     public List<String> getHeaders() {
         return headers;
     }
