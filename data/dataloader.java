@@ -39,7 +39,7 @@ public class DataLoader {
         }
     }
 
-    // Get unique countries from data
+    // Get unique countries from datast
     public Set<String> getCountries() {
         Set<String> countries = new TreeSet<>(); //creates a set of countries.
         for (Map<String, String> row : data) {
