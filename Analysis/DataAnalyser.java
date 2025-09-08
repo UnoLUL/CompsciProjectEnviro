@@ -1,4 +1,4 @@
-package analysis;
+package Analysis;
 
 import data.DataLoader;
 import java.util.*;

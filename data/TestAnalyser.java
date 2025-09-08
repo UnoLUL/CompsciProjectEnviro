@@ -1,12 +1,12 @@
 import data.DataLoader;
-import analysis.DataAnalyzer;
+import Analysis.DataAnalyser;
 
-public class TestAnalyzer {
+public class TestAnalyser {
     public static void main(String[] args) throws Exception {
         DataLoader loader = new DataLoader();
         loader.loadCSV("data/co2-emissions-per-capita.csv");
 
-        DataAnalyzer analyzer = new DataAnalyzer(loader);
+        DataAnalyser analyzer = new DataAnalyser(loader);
 
         System.out.println("Average emissions (Australia): " + analyzer.getAverageEmissions("Australia"));
         System.out.println("Emissions in 2000 (Australia): " + analyzer.getEmissionsByYear("Australia", "2000"));
