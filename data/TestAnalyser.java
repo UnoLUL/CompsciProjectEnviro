@@ -4,7 +4,8 @@ import java.util.DoubleSummaryStatistics;
 public class TestAnalyser {
     public static void main(String[] args) {
         // Load the CSV file
-        DataLoader loader = new DataLoader("data/co2-emissions-per-capita.csv");
+        DataLoader loader = new DataLoader();
+        loader.loadCSV("data/co2-emissions-per-capita.csv");
 
         // Create analyser with loader
         DataAnalyser analyser = new DataAnalyser(loader);

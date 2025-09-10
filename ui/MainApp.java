@@ -9,6 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.control.*;
 import javafx.scene.chart.*;
 import javafx.collections.*;
+import javafx.scene.layout.HBox;
 
 import java.io.File;
 import java.util.*;
