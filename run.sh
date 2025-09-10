@@ -6,3 +6,8 @@ javac --module-path ~/Downloads/javafx-sdk-24.0.2/lib --add-modules javafx.contr
 
 # Run the JavaFX application
 java --module-path ~/Downloads/javafx-sdk-24.0.2/lib --add-modules javafx.controls,javafx.fxml ui.MainApp
+
+
+
+
+# to run the project, use ./run.sh in the terminal in the root of the folder.

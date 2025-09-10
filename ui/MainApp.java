@@ -66,7 +66,7 @@ public class MainApp extends Application {
         primaryStage.show();
     }
 
-    private void loadCSV(Stage stage) {
+    private void loadCSV(Stage stage) { // file opener, uses loadCSV to get the files
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open CSV File");
         File file = fileChooser.showOpenDialog(stage);
@@ -88,7 +88,7 @@ public class MainApp extends Application {
         String selectedCountry = countryBox.getValue();
         Integer selectedYear = yearBox.getValue();
 
-        // Line chart: emissions over time for selected country
+        // Line chart: emissions over time for selected country, needs some more work on the algo
         lineChart.getData().clear();
         if (selectedCountry != null) {
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
@@ -100,7 +100,7 @@ public class MainApp extends Application {
             lineChart.getData().add(series);
         }
 
-        // Bar chart: average emissions per country
+        // Bar chart: average emissions per country from the file, not sure if this works yet
         barChart.getData().clear();
         XYChart.Series<String, Number> avgSeries = new XYChart.Series<>();
         avgSeries.setName("Average Emissions");
