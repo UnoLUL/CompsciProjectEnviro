@@ -1,8 +1,7 @@
 package data;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 public class DataAnalyser {
     private DataLoader loader;
@@ -11,7 +10,6 @@ public class DataAnalyser {
         this.loader = loader;
     }
 
-    // Example method: average emissions per country
     public Map<String, Double> getAverageEmissions() {
         return loader.getData().stream()
                 .collect(Collectors.groupingBy(
@@ -20,16 +18,17 @@ public class DataAnalyser {
                 ));
     }
 
-    // Example method: emissions for a specific year
     public List<DataRecord> getEmissionsByYear(int year) {
         return loader.getData().stream()
                 .filter(record -> record.getYear() == year)
                 .collect(Collectors.toList());
     }
 
-    // Example method: min/max emissions for each country
     public Map<String, DoubleSummaryStatistics> getMinMaxEmissions() {
         return loader.getData().stream()
                 .collect(Collectors.groupingBy(
                         DataRecord::getCountry,
                         Collectors.summarizingDouble(DataRecord::getEmission)
+                ));
+    }
+}
