@@ -88,19 +88,40 @@ public class MainApp extends Application {
         String selectedCountry = countryBox.getValue();
         Integer selectedYear = yearBox.getValue();
 
-        // Line chart: emissions over time for selected country, needs some more work on the algo
+        // Line chart: emissions over time for selected country, with dynamic year range
         lineChart.getData().clear();
+        NumberAxis xAxis = (NumberAxis) lineChart.getXAxis();
+
         if (selectedCountry != null) {
-            XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName(selectedCountry);
-            loader.getData().stream()
+            List<DataRecord> countryRecords = loader.getData().stream()
                     .filter(r -> r.getCountry().equals(selectedCountry))
                     .sorted(Comparator.comparingInt(DataRecord::getYear))
-                    .forEach(r -> series.getData().add(new XYChart.Data<>(r.getYear(), r.getEmission())));
-            lineChart.getData().add(series);
+                    .toList();
+
+            if (!countryRecords.isEmpty()) {
+                int minYear = countryRecords.get(0).getYear();
+                int maxYear = countryRecords.get(countryRecords.size() - 1).getYear();
+
+                // Disable auto-ranging and set axis bounds
+                xAxis.setAutoRanging(false);
+                xAxis.setLowerBound(minYear);
+                xAxis.setUpperBound(maxYear);
+                xAxis.setTickUnit(5);
+
+                XYChart.Series<Number, Number> series = new XYChart.Series<>();
+                series.setName(selectedCountry);
+
+                for (DataRecord r : countryRecords) {
+                    series.getData().add(new XYChart.Data<>(r.getYear(), r.getEmission()));
+                }
+                lineChart.getData().add(series);
+            }
+        } else {
+            // Re-enable auto-ranging if no country is selected
+            xAxis.setAutoRanging(true);
         }
 
-        // Bar chart: average emissions per country from the file, not sure if this works yet
+        // Bar chart: average emissions per country from the file
         barChart.getData().clear();
         XYChart.Series<String, Number> avgSeries = new XYChart.Series<>();
         avgSeries.setName("Average Emissions");
