@@ -1,5 +1,5 @@
 package ui;
-
+// this is the main class for the project, encompassing most of my work, below you will see JavaFX as the framework for the GUI
 import data.*;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -12,9 +12,13 @@ import javafx.collections.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
-
 import java.io.File;
 import java.util.*;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.WritableImage;
+import javafx.scene.SnapshotParameters;
+import javax.imageio.ImageIO;
+// all the above imports are used to setup javaFX, to see more on how they work visit the offical JavaFX imports.
 
 public class MainApp extends Application {
     private DataLoader loader = new DataLoader();
@@ -31,12 +35,20 @@ public class MainApp extends Application {
         Button loadBtn = new Button("Load CSV");
         loadBtn.setOnAction(e -> loadCSV(primaryStage));
 
+        // Add this button for exporting
+        Button exportBtn = new Button("Export Chart as PNG");
+        exportBtn.setOnAction(e -> exportChartAsPNG());
+
         countryBox1.setPromptText("Select Country 1");
         countryBox2.setPromptText("Select Country 2");
         countryBox1.setOnAction(e -> updateCharts());
         countryBox2.setOnAction(e -> updateCharts());
 
-        HBox controls = new HBox(10, loadBtn, countryBox1, countryBox2);
+        // Add exportBtn to the controls HBox
+        HBox controls = new HBox(10, loadBtn, countryBox1, countryBox2, exportBtn);
+        controls.setPadding(new Insets(10));
+        exportBtn.setMinWidth(150);
+        exportBtn.setTooltip(new Tooltip("Export the current chart as a PNG image"));
 
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -126,11 +138,11 @@ public class MainApp extends Application {
         }
 
         // Update summary statistics panel
-        statsPanel.getChildren().clear();
+        statsPanel.getChildren().clear(); // stat panel. uses a for loop to iterate through the data and gets all the info required.
         for (int i = 0; i < countryRecordsList.size(); i++) {
-            List<DataRecord> records = countryRecordsList.get(i);
-            String countryName = countryNames.get(i);
-            List<Double> emissions = records.stream().map(DataRecord::getEmission).toList();
+            List<DataRecord> records = countryRecordsList.get(i); 
+            String countryName = countryNames.get(i); // pulls countrynames
+            List<Double> emissions = records.stream().map(DataRecord::getEmission).toList(); // making the pist
 
             double mean = emissions.stream().mapToDouble(Double::doubleValue).average().orElse(Double.NaN);
             double min = emissions.stream().mapToDouble(Double::doubleValue).min().orElse(Double.NaN);
@@ -139,7 +151,7 @@ public class MainApp extends Application {
             double median = calcMedian(emissions);
             Double mode = calcMode(emissions);
 
-            Label title = new Label("Statistics for " + countryName);
+            Label title = new Label("Statistics for " + countryName); 
             title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
             Label meanLabel = new Label("Mean: " + String.format("%.3f", mean));
             Label medianLabel = new Label("Median: " + String.format("%.3f", median));
@@ -150,6 +162,11 @@ public class MainApp extends Application {
             Label yearsLabel = new Label("Year Range: " + records.get(0).getYear() + " - " + records.get(records.size()-1).getYear());
             Label changeLabel = new Label("Total Change: " + String.format("%.3f", records.get(records.size()-1).getEmission() - records.get(0).getEmission()));
 
+            //All the labeling with proper formatting (%.3f)
+
+
+
+            // setting up the Vbox, all this stuff is pretty inuitive if you have used HTML and CSS before.
             VBox stats = new VBox(3, title, meanLabel, medianLabel, modeLabel, minLabel, maxLabel, stdLabel, yearsLabel, changeLabel);
             stats.setStyle("-fx-border-color: #ccc; -fx-padding: 8px; -fx-background-color: #f9f9f9; -fx-border-radius: 5px; -fx-background-radius: 5px;");
             statsPanel.getChildren().add(stats);
@@ -188,6 +205,21 @@ public class MainApp extends Application {
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
         alert.showAndWait();
+    }
+
+    private void exportChartAsPNG() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Chart as PNG");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG Image", "*.png"));
+        File file = fileChooser.showSaveDialog(lineChart.getScene().getWindow());
+        if (file != null) {
+            WritableImage image = lineChart.snapshot(new SnapshotParameters(), null);
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            } catch (Exception ex) {
+                showError("Failed to save PNG: " + ex.getMessage());
+            }
+        }
     }
 
     public static void main(String[] args) {
