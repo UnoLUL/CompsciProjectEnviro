@@ -26,7 +26,7 @@ public class MainApp extends Application {
     private ComboBox<String> countryBox1;
     private ComboBox<String> countryBox2;
 
-    // Stats panel restructured
+    // Stats panel redone
     private BorderPane statsPanel;
     private VBox statsContent;
     private Button exportBtn;
@@ -42,11 +42,12 @@ public class MainApp extends Application {
         // Controls
         Button loadBtn = new Button("Load CSV");
         loadBtn.setOnAction(e -> loadCSV(primaryStage));
+        loadBtn.setPrefWidth(100);
 
         exportBtn = new Button("Export to CSV");
         exportBtn.setOnAction(e -> exportData());
         exportBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;");
-        exportBtn.setPrefWidth(140);
+        exportBtn.setPrefWidth(120);
 
         exportPngBtn = new Button("Export Chart as PNG");
         exportPngBtn.setOnAction(e -> exportChartAsPNG());
@@ -57,13 +58,18 @@ public class MainApp extends Application {
         countryBox2 = new ComboBox<>();
         countryBox1.setPromptText("Select Country 1");
         countryBox2.setPromptText("Select Country 2");
+        countryBox1.setPrefWidth(160);
+        countryBox2.setPrefWidth(160);
 
-        countryBox1.setOnAction(e -> updateCharts());
-        countryBox2.setOnAction(e -> updateCharts());
-
-        // Add export buttons to the controls HBox
+        // Prevent ComboBoxes from expanding and hiding buttons
         HBox controls = new HBox(10, loadBtn, exportBtn, exportPngBtn, countryBox1, countryBox2);
         controls.setPadding(new Insets(10));
+        controls.setPrefHeight(50);
+        HBox.setHgrow(loadBtn, Priority.NEVER);
+        HBox.setHgrow(exportBtn, Priority.NEVER);
+        HBox.setHgrow(exportPngBtn, Priority.NEVER);
+        HBox.setHgrow(countryBox1, Priority.NEVER);
+        HBox.setHgrow(countryBox2, Priority.NEVER);
 
         // Chart setup
         NumberAxis xAxis = new NumberAxis();
