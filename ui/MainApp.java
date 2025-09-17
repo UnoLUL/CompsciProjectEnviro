@@ -52,11 +52,13 @@ public class MainApp extends Application {
         analyser = new DataAnalyser(loader);
 
         Scene scene = new Scene(createMainLayout(), 1400, 800);
-        scene.getStylesheets().add(createStylesheet());
         
         primaryStage.setScene(scene);
         primaryStage.setTitle("Climate Data Visualizer");
         primaryStage.show();
+        
+        // Apply custom styling after scene is shown
+        applyCustomStyles(scene);
         
         updateCharts();
     }
@@ -141,10 +143,13 @@ public class MainApp extends Application {
         lineChart.setTitle("Climate Data Comparison");
         lineChart.setLegendVisible(true);
         lineChart.setCreateSymbols(true);
-        lineChart.setStyle("-fx-background-color: " + CARD_BG + "; -fx-border-color: " + BORDER_COLOR + "; -fx-border-radius: 12; -fx-background-radius: 12;");
-        
-        // Force dark theme on chart
-        lineChart.setAnimated(false);
+        lineChart.setAnimated(true); // Re-enable animations
+        lineChart.setStyle(
+            "-fx-background-color: " + CARD_BG + ";" +
+            "-fx-border-color: " + BORDER_COLOR + ";" + 
+            "-fx-border-radius: 12;" +
+            "-fx-background-radius: 12;"
+        );
         
         VBox.setVgrow(lineChart, Priority.ALWAYS);
         container.getChildren().add(lineChart);
@@ -227,109 +232,95 @@ public class MainApp extends Application {
         return comboBox;
     }
 
-    private String createStylesheet() {
-        return """
-            .combo-box .list-cell {
-                -fx-background-color: %s;
-                -fx-text-fill: %s;
-                -fx-padding: 8 12 8 12;
-            }
-            
-            .combo-box .list-cell:hover {
-                -fx-background-color: %s;
-            }
-            
-            .combo-box-popup .list-view {
-                -fx-background-color: %s;
-                -fx-border-color: %s;
-                -fx-border-radius: 6;
-                -fx-background-radius: 6;
-            }
-            
-            .chart {
-                -fx-background-color: %s;
-                -fx-legend-visible: true;
-            }
-            
-            .chart-plot-background {
-                -fx-background-color: %s;
-            }
-            
-            .chart-content {
-                -fx-padding: 20px;
-            }
-            
-            .chart-vertical-grid-lines {
-                -fx-stroke: #404040;
-            }
-            
-            .chart-horizontal-grid-lines {
-                -fx-stroke: #404040;
-            }
-            
-            .chart-alternative-row-fill {
-                -fx-fill: transparent;
-            }
-            
-            .chart-alternative-column-fill {
-                -fx-fill: transparent;
-            }
-            
-            .axis {
-                -fx-tick-label-fill: %s;
-                -fx-font-size: 11px;
-                -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
-            }
-            
-            .axis-label {
-                -fx-text-fill: %s;
-                -fx-font-size: 13px;
-                -fx-font-weight: bold;
-                -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
-            }
-            
-            .chart-title {
-                -fx-text-fill: %s;
-                -fx-font-size: 16px;
-                -fx-font-weight: bold;
-                -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
-            }
-            
-            .chart-legend {
-                -fx-background-color: transparent;
-                -fx-padding: 10 0 0 0;
-            }
-            
-            .chart-legend-item-symbol {
-                -fx-background-color: transparent;
-            }
-            
-            .chart-legend-item {
-                -fx-text-fill: %s;
-                -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
-            }
-            
-            .scroll-pane {
-                -fx-background-color: transparent;
-            }
-            
-            .scroll-pane .viewport {
-                -fx-background-color: transparent;
-            }
-            
-            .scroll-bar {
-                -fx-background-color: %s;
-            }
-            
-            .scroll-bar .thumb {
-                -fx-background-color: %s;
-                -fx-background-radius: 4;
-            }
-            """.formatted(
-                SECONDARY_BG, TEXT_PRIMARY, BORDER_COLOR, SECONDARY_BG, BORDER_COLOR,
-                PRIMARY_BG, PRIMARY_BG, TEXT_PRIMARY, TEXT_PRIMARY, TEXT_PRIMARY, TEXT_PRIMARY,
-                SECONDARY_BG, BORDER_COLOR
+    private void applyCustomStyles(Scene scene) {
+        // Apply dark theme styles to chart components
+        scene.getRoot().applyCss();
+        scene.getRoot().layout();
+        
+        // Force chart background and styling
+        if (lineChart != null) {
+            // Apply dark theme to chart
+            lineChart.lookup(".chart").setStyle(
+                "-fx-background-color: " + CARD_BG + ";"
             );
+            
+            lineChart.lookup(".chart-plot-background").setStyle(
+                "-fx-background-color: " + CARD_BG + ";"
+            );
+            
+            lineChart.lookup(".chart-content").setStyle(
+                "-fx-padding: 20px;"
+            );
+            
+            // Style axes
+            lineChart.lookup(".axis").setStyle(
+                "-fx-tick-label-fill: " + TEXT_PRIMARY + ";" +
+                "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;"
+            );
+            
+            // Style axis labels
+            lineChart.lookupAll(".axis-label").forEach(node -> {
+                node.setStyle(
+                    "-fx-text-fill: " + TEXT_PRIMARY + ";" +
+                    "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;" +
+                    "-fx-font-weight: bold;"
+                );
+            });
+            
+            // Style chart title
+            lineChart.lookup(".chart-title").setStyle(
+                "-fx-text-fill: " + TEXT_PRIMARY + ";" +
+                "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;" +
+                "-fx-font-weight: bold;"
+            );
+            
+            // Style legend
+            lineChart.lookup(".chart-legend").setStyle(
+                "-fx-background-color: " + SECONDARY_BG + ";" +
+                "-fx-border-color: " + BORDER_COLOR + ";" +
+                "-fx-border-radius: 8;" +
+                "-fx-background-radius: 8;" +
+                "-fx-padding: 10;"
+            );
+            
+            lineChart.lookupAll(".chart-legend-item").forEach(node -> {
+                node.setStyle(
+                    "-fx-text-fill: " + TEXT_PRIMARY + ";" +
+                    "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;"
+                );
+            });
+            
+            // Keep the colored symbols visible (don't override their colors)
+            // The legend symbols will automatically match the line colors
+            
+            // Style grid lines
+            lineChart.lookupAll(".chart-vertical-grid-lines").forEach(node -> {
+                node.setStyle("-fx-stroke: #404040;");
+            });
+            
+            lineChart.lookupAll(".chart-horizontal-grid-lines").forEach(node -> {
+                node.setStyle("-fx-stroke: #404040;");
+            });
+        }
+        
+        // Style combo box dropdowns
+        scene.getRoot().lookupAll(".combo-box-popup .list-view").forEach(node -> {
+            node.setStyle(
+                "-fx-background-color: " + SECONDARY_BG + ";" +
+                "-fx-border-color: " + BORDER_COLOR + ";" +
+                "-fx-border-radius: 6;" +
+                "-fx-background-radius: 6;"
+            );
+        });
+        
+        scene.getRoot().lookupAll(".combo-box .list-cell").forEach(node -> {
+            node.setStyle(
+                "-fx-background-color: " + SECONDARY_BG + ";" +
+                "-fx-text-fill: " + TEXT_PRIMARY + ";" +
+                "-fx-padding: 8 12 8 12;" +
+                "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;"
+            );
+        });
     }
 
     private void loadCSV(Stage stage) {
@@ -351,6 +342,11 @@ public class MainApp extends Application {
                 
                 configureYearAxis();
                 updateCharts();
+                
+                // Apply styling after loading data
+                javafx.application.Platform.runLater(() -> {
+                    applyCustomStyles(stage.getScene());
+                });
                 
                 statusLabel.setText("Loaded " + data.size() + " records from " + loader.getCountries().size() + " countries");
                 statusLabel.setStyle("-fx-text-fill: " + SUCCESS_GREEN + "; -fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;");
@@ -395,6 +391,11 @@ public class MainApp extends Application {
         }
 
         updateStatistics();
+        
+        // Reapply chart styling after data is updated
+        javafx.application.Platform.runLater(() -> {
+            applyCustomStyles(lineChart.getScene());
+        });
     }
 
     private void addCountrySeries(String country, String color) {
