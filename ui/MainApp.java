@@ -53,8 +53,8 @@ public class MainApp extends Application {
         countryBox1.setOnAction(e -> updateCharts());
         countryBox2.setOnAction(e -> updateCharts());
 
-        // Controls HBox (top bar only has load + country selectors)
-        HBox controls = new HBox(10, loadBtn, countryBox1, countryBox2);
+        // Controls HBox (top bar has load, country selectors, and PNG export)
+        HBox controls = new HBox(10, loadBtn, countryBox1, countryBox2, pngExportBtn);
         controls.setPadding(new Insets(10));
 
         // Chart setup
@@ -84,6 +84,10 @@ public class MainApp extends Application {
         HBox exportButtons = new HBox(10, exportBtn, exportPngBtn);
         exportButtons.setPadding(new Insets(10, 0, 0, 0));
         statsPanel.setBottom(exportButtons);
+
+        // Add PNG export button to the main controls at the top
+        Button pngExportBtn = new Button("Export PNG");
+        pngExportBtn.setOnAction(e -> exportChartAsPNG());
 
         // Base layout
         BorderPane root = new BorderPane();
