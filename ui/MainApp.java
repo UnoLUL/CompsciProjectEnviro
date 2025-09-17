@@ -1,6 +1,7 @@
 package data;
 
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
@@ -11,6 +12,7 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,6 +30,7 @@ public class MainApp extends Application {
     private BorderPane statsPanel;
     private VBox statsContent;
     private Button exportBtn;
+    private Button exportPngBtn; 
 
     private List<EmissionRecord> data;
 
@@ -40,6 +43,16 @@ public class MainApp extends Application {
         Button loadBtn = new Button("Load CSV");
         loadBtn.setOnAction(e -> loadCSV(primaryStage));
 
+        exportBtn = new Button("Export to CSV");
+        exportBtn.setOnAction(e -> exportData());
+        exportBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;");
+        exportBtn.setPrefWidth(140);
+
+        exportPngBtn = new Button("Export Chart as PNG");
+        exportPngBtn.setOnAction(e -> exportChartAsPNG());
+        exportPngBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
+        exportPngBtn.setPrefWidth(160);
+
         countryBox1 = new ComboBox<>();
         countryBox2 = new ComboBox<>();
         countryBox1.setPromptText("Select Country 1");
@@ -48,7 +61,8 @@ public class MainApp extends Application {
         countryBox1.setOnAction(e -> updateCharts());
         countryBox2.setOnAction(e -> updateCharts());
 
-        HBox controls = new HBox(10, loadBtn, countryBox1, countryBox2);
+        // Add export buttons to the controls HBox
+        HBox controls = new HBox(10, loadBtn, exportBtn, exportPngBtn, countryBox1, countryBox2);
         controls.setPadding(new Insets(10));
 
         // Chart setup
@@ -66,10 +80,6 @@ public class MainApp extends Application {
 
         statsContent = new VBox(10);
         statsPanel.setCenter(statsContent);
-
-        exportBtn = new Button("Export to CSV");
-        exportBtn.setOnAction(e -> exportData());
-        statsPanel.setBottom(exportBtn);
 
         // base layout
         BorderPane root = new BorderPane();
@@ -153,6 +163,23 @@ public class MainApp extends Application {
                 showAlert("Export Successful", "Data exported to " + file.getAbsolutePath());
             } catch (IOException ex) {
                 showAlert("Export Failed", "Could not save file.");
+            }
+        }
+    }
+
+    private void exportChartAsPNG() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Chart as PNG");
+        fileChooser.setInitialFileName("chart.png");
+        File file = fileChooser.showSaveDialog(null);
+
+        if (file != null) {
+            try {
+                javafx.scene.image.WritableImage image = lineChart.snapshot(null, null);
+                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+                showAlert("Export Successful", "Chart exported to " + file.getAbsolutePath());
+            } catch (IOException ex) {
+                showAlert("Export Failed", "Could not save PNG file.");
             }
         }
     }
