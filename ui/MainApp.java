@@ -47,8 +47,8 @@ public class MainApp extends Application {
         // Add exportBtn to the controls HBox
         HBox controls = new HBox(10, loadBtn, countryBox1, countryBox2, exportBtn);
         controls.setPadding(new Insets(10));
-        exportBtn.setMinWidth(150);
-        exportBtn.setTooltip(new Tooltip("Export the current chart as a PNG image"));
+        controls.setStyle("-fx-background-color: #e0e0e0;"); // Add this line
+        exportBtn.setMinWidth(180); // Increase width for visibility
 
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
@@ -183,7 +183,7 @@ public class MainApp extends Application {
         return (sorted.get(n / 2 - 1) + sorted.get(n / 2)) / 2.0;
     }
 
-    private Double calcMode(List<Double> values) {
+    private Double calcMode(List<Double> values) { //stats page variables and math to figure out different values.
         if (values.isEmpty()) return null;
         Map<Double, Integer> freq = new HashMap<>();
         for (Double v : values) freq.put(v, freq.getOrDefault(v, 0) + 1);
@@ -215,8 +215,12 @@ public class MainApp extends Application {
         if (file != null) {
             WritableImage image = lineChart.snapshot(new SnapshotParameters(), null);
             try {
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+                boolean result = ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+                if (!result) {
+                    showError("No appropriate writer found for PNG format.");
+                }
             } catch (Exception ex) {
+                ex.printStackTrace(); // Add this for debugging
                 showError("Failed to save PNG: " + ex.getMessage());
             }
         }
