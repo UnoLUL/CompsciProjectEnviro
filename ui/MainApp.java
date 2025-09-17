@@ -1,5 +1,5 @@
 package ui;
-
+// all major imports for javaFX
 import data.*;
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
@@ -14,12 +14,11 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.animation.FadeTransition;
-import javafx.animation.TranslateTransition;
 import javafx.util.Duration;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-
+// some other imports for javaIO like lists, file and hashmaps.
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.util.List;
@@ -28,41 +27,51 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Climate Data Visualizer - A  data visualisation application
+ * for analysing and comparing CO2 emissions data across countries and time periods
+ * the program allows users to select a csv file, then the program uses an algorithim i wrote to sort through all collums and get the raw data
+ * afterwards it displays the data in graph format and allows the user to select the year periods and some basic or detailed stats depending on their 
+ * interests, after everything is finished, if needed the user can export their graphs to PNG.
+ */
 public class MainApp extends Application {
+    
+    // ========== CORE COMPONENTS ==========
     private DataLoader loader;
     private DataAnalyser analyser;
+    private List<DataRecord> data;
+    
+    // ========== UI COMPONENTS ==========
+    // Chart components
     private LineChart<Number, Number> lineChart;
     private NumberAxis xAxis;
     private NumberAxis yAxis;
+    
+    // Controls
     private ComboBox<String> countryBox1;
     private ComboBox<String> countryBox2;
-    private VBox statsContent;
-    private Label statusLabel;
-    private ProgressIndicator loadingIndicator;
-    private List<DataRecord> data;
-    private int exportCounter = 1;
-
-    // Year range controls
     private Slider minYearSlider;
     private Slider maxYearSlider;
     private Label yearRangeLabel;
+    
+    // Layout panels
+    private VBox statsContent;
+    private VBox comparisonPanel;
+    private Label statusLabel;
+    private ProgressIndicator loadingIndicator;
+    
+    // ========== DATA MANAGEMENT ==========
+    private ObservableList<String> allCountries = FXCollections.observableArrayList();
     private int globalMinYear = 1750;
     private int globalMaxYear = 2025;
-
-    // Caching for performance
+    private int exportCounter = 1;
+    
+    // Performance caching so your computer doesnt blow up
     private Map<String, DoubleSummaryStatistics> statsCache = new HashMap<>();
     private Map<String, Double> medianCache = new HashMap<>();
     private Map<String, Double> stdDevCache = new HashMap<>();
-
-    // Comparison panel
-    private VBox comparisonPanel;
-
-    // Searchable dropdown data
-    private ObservableList<String> allCountries = FXCollections.observableArrayList();
-    private FilteredList<String> filteredCountries1;
-    private FilteredList<String> filteredCountries2;
-
-    // Color scheme
+    
+    // ========== STYLING CONSTANTS ==========
     private final String PRIMARY_BG = "#1a1a1a";
     private final String SECONDARY_BG = "#2d2d30";
     private final String CARD_BG = "#1a1a1a";
@@ -73,7 +82,9 @@ public class MainApp extends Application {
     private final String SUCCESS_GREEN = "#10b981";
     private final String BORDER_COLOR = "#4a4a4a";
 
-    @Override
+    // ========== APPLICATION STARTUP ==========
+    
+  
     public void start(Stage primaryStage) {
         loader = new DataLoader();
         analyser = new DataAnalyser(loader);
@@ -88,6 +99,11 @@ public class MainApp extends Application {
         updateCharts();
     }
 
+    // ========== LAYOUT CREATION ==========
+    
+    /**
+     * Creates the main application layout with header, content panels, and status bar
+     */
     private BorderPane createMainLayout() {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: " + PRIMARY_BG + ";");
@@ -111,22 +127,26 @@ public class MainApp extends Application {
         return root;
     }
 
+    /**
+     * Creates the application header with title and main controls
+     */
     private VBox createHeader() {
         VBox header = new VBox();
         header.setStyle("-fx-background-color: " + SECONDARY_BG + "; -fx-border-color: " + BORDER_COLOR + "; -fx-border-width: 0 0 1 0;");
         header.setPadding(new Insets(20));
         header.setSpacing(15);
 
+        // Application title
         Label title = new Label("Climate Data Visualizer");
         title.setStyle("-fx-text-fill: " + TEXT_PRIMARY + "; -fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;");
         
+        // Main control bar
         HBox controls = new HBox(15);
         controls.setAlignment(Pos.CENTER_LEFT);
         
         Button loadBtn = createStyledButton("Load Data", ACCENT_BLUE);
         loadBtn.setOnAction(e -> loadCSVAsync((Stage) loadBtn.getScene().getWindow()));
         
-        // Create searchable combo boxes
         countryBox1 = createSearchableComboBox("Search first country...");
         countryBox2 = createSearchableComboBox("Search second country...");
         
@@ -141,22 +161,25 @@ public class MainApp extends Application {
         return header;
     }
 
+    /**
+     * Creates the left control panel with year range controls and comparison
+     */
     private VBox createLeftPanel() {
         VBox leftPanel = new VBox();
         leftPanel.setSpacing(20);
         leftPanel.setPrefWidth(300);
         leftPanel.setMaxWidth(300);
 
-        // Year Range Controls
         VBox yearControls = createYearRangeControls();
-        
-        // Comparison Panel
         comparisonPanel = createComparisonPanel();
         
         leftPanel.getChildren().addAll(yearControls, comparisonPanel);
         return leftPanel;
     }
 
+    /**
+     * Creates year range selection controls with sliders
+     */
     private VBox createYearRangeControls() {
         VBox yearPanel = new VBox(15);
         yearPanel.setStyle("-fx-background-color: " + CARD_BG + "; -fx-border-color: " + BORDER_COLOR + "; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 20;");
@@ -167,6 +190,7 @@ public class MainApp extends Application {
         yearRangeLabel = new Label("1750 - 2025");
         yearRangeLabel.setStyle("-fx-text-fill: " + TEXT_SECONDARY + "; -fx-font-size: 14px; -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;");
         
+        // Min year controls
         Label minLabel = new Label("From:");
         minLabel.setStyle("-fx-text-fill: " + TEXT_SECONDARY + "; -fx-font-size: 12px; -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;");
         
@@ -177,8 +201,9 @@ public class MainApp extends Application {
             }
             updateYearRange();
         });
-        javafx.application.Platform.runLater(() -> styleSlider(minYearSlider));
+        javafx.application.Platform.runLater(() -> styleSliderComponents(minYearSlider));
         
+        // Max year controls
         Label maxLabel = new Label("To:");
         maxLabel.setStyle("-fx-text-fill: " + TEXT_SECONDARY + "; -fx-font-size: 12px; -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;");
         
@@ -189,7 +214,7 @@ public class MainApp extends Application {
             }
             updateYearRange();
         });
-        javafx.application.Platform.runLater(() -> styleSlider(maxYearSlider));
+        javafx.application.Platform.runLater(() -> styleSliderComponents(maxYearSlider));
 
         Button resetYearBtn = createStyledButton("Reset Range", ACCENT_BLUE);
         resetYearBtn.setPrefWidth(240);
@@ -199,6 +224,9 @@ public class MainApp extends Application {
         return yearPanel;
     }
 
+    /**
+     * Creates the quick comparison panel for country analysis
+     */
     private VBox createComparisonPanel() {
         VBox panel = new VBox(15);
         panel.setStyle("-fx-background-color: " + CARD_BG + "; -fx-border-color: " + BORDER_COLOR + "; -fx-border-radius: 12; -fx-background-radius: 12; -fx-padding: 20;");
@@ -210,82 +238,9 @@ public class MainApp extends Application {
         return panel;
     }
 
-    private void styleSlider(Slider slider) {
-        slider.setStyle(
-            "-fx-control-inner-background: " + SECONDARY_BG + ";" +
-            "-fx-accent: " + ACCENT_BLUE + ";" +
-            "-fx-background-color: " + SECONDARY_BG + ";" +
-            "-fx-border-color: " + BORDER_COLOR + ";" +
-            "-fx-border-radius: 4;" +
-            "-fx-background-radius: 4;"
-        );
-        
-        // Style the slider thumb
-        slider.lookup(".thumb").setStyle(
-            "-fx-background-color: " + ACCENT_BLUE + ";" +
-            "-fx-background-radius: 8;" +
-            "-fx-border-color: " + TEXT_PRIMARY + ";" +
-            "-fx-border-width: 1;" +
-            "-fx-border-radius: 8;" +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 3, 0, 0, 1);"
-        );
-        
-        // Style the slider track
-        slider.lookup(".track").setStyle(
-            "-fx-background-color: " + BORDER_COLOR + ";" +
-            "-fx-background-radius: 2;"
-        );
-    }
-
-    private ComboBox<String> createSearchableComboBox(String prompt) {
-        ComboBox<String> comboBox = new ComboBox<>();
-        comboBox.setPromptText(prompt);
-        comboBox.setPrefWidth(250);
-        comboBox.setEditable(true);
-        comboBox.setVisibleRowCount(8);
-        
-        comboBox.setStyle(
-            "-fx-background-color: " + SECONDARY_BG + ";" +
-            "-fx-text-fill: " + TEXT_PRIMARY + ";" +
-            "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;" +
-            "-fx-font-size: 13px;" +
-            "-fx-border-color: " + BORDER_COLOR + ";" +
-            "-fx-border-radius: 8;" +
-            "-fx-background-radius: 8;" +
-            "-fx-padding: 8 12 8 12;" +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);"
-        );
-
-        // Improve the text field styling within the combo box
-        comboBox.getEditor().setStyle(
-            "-fx-text-fill: " + TEXT_PRIMARY + ";" +
-            "-fx-background-color: transparent;" +
-            "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;" +
-            "-fx-font-size: 13px;"
-        );
-
-        // Make it searchable
-        comboBox.getEditor().textProperty().addListener((obs, oldText, newText) -> {
-            if (comboBox.getItems().equals(allCountries)) {
-                FilteredList<String> filteredItems = new FilteredList<>(allCountries);
-                filteredItems.setPredicate(item -> {
-                    if (newText == null || newText.isEmpty()) {
-                        return true;
-                    }
-                    return item.toLowerCase().contains(newText.toLowerCase());
-                });
-                comboBox.setItems(filteredItems);
-                if (!comboBox.isShowing() && !filteredItems.isEmpty()) {
-                    comboBox.show();
-                }
-            }
-        });
-
-        comboBox.setOnAction(e -> updateChartsWithAnimation());
-        
-        return comboBox;
-    }
-
+    /**
+     * Creates the main chart container for data visualization
+     */
     private VBox createChartContainer() {
         VBox container = new VBox();
         container.setSpacing(10);
@@ -316,6 +271,9 @@ public class MainApp extends Application {
         return container;
     }
 
+    /**
+     * Creates the statistics panel for displaying country data
+     */
     private VBox createStatsPanel() {
         VBox panel = new VBox();
         panel.setPrefWidth(350);
@@ -342,6 +300,9 @@ public class MainApp extends Application {
         return panel;
     }
 
+    /**
+     * Creates the bottom status bar with loading indicator
+     */
     private HBox createStatusBar() {
         HBox statusBar = new HBox();
         statusBar.setPadding(new Insets(10, 20, 10, 20));
@@ -366,6 +327,11 @@ public class MainApp extends Application {
         return statusBar;
     }
 
+    // ========== UI COMPONENT FACTORIES ==========
+    
+    /**
+     * Creates a styled button with consistent theme and hover effects
+     */
     private Button createStyledButton(String text, String color) {
         Button button = new Button(text);
         button.setStyle(
@@ -381,7 +347,7 @@ public class MainApp extends Application {
             "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);"
         );
         
-        // More subtle hover effects
+        // Hover effects
         button.setOnMouseEntered(e -> {
             button.setStyle(
                 "-fx-background-color: derive(" + color + ", 10%);" +
@@ -418,6 +384,62 @@ public class MainApp extends Application {
         return button;
     }
 
+    /**
+     * Creates a searchable combo box with real-time filtering
+     */
+    private ComboBox<String> createSearchableComboBox(String prompt) {
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.setPromptText(prompt);
+        comboBox.setPrefWidth(250);
+        comboBox.setEditable(true);
+        comboBox.setVisibleRowCount(8);
+        
+        comboBox.setStyle(
+            "-fx-background-color: " + SECONDARY_BG + ";" +
+            "-fx-text-fill: " + TEXT_PRIMARY + ";" +
+            "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;" +
+            "-fx-font-size: 13px;" +
+            "-fx-border-color: " + BORDER_COLOR + ";" +
+            "-fx-border-radius: 8;" +
+            "-fx-background-radius: 8;" +
+            "-fx-padding: 8 12 8 12;" +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 2, 0, 0, 1);"
+        );
+
+        // Style the text field
+        comboBox.getEditor().setStyle(
+            "-fx-text-fill: " + TEXT_PRIMARY + ";" +
+            "-fx-background-color: transparent;" +
+            "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;" +
+            "-fx-font-size: 13px;"
+        );
+
+        // Enable search functionality
+        comboBox.getEditor().textProperty().addListener((obs, oldText, newText) -> {
+            if (comboBox.getItems().equals(allCountries)) {
+                FilteredList<String> filteredItems = new FilteredList<>(allCountries);
+                filteredItems.setPredicate(item -> {
+                    if (newText == null || newText.isEmpty()) {
+                        return true;
+                    }
+                    return item.toLowerCase().contains(newText.toLowerCase());
+                });
+                comboBox.setItems(filteredItems);
+                if (!comboBox.isShowing() && !filteredItems.isEmpty()) {
+                    comboBox.show();
+                }
+            }
+        });
+
+        comboBox.setOnAction(e -> updateChartsWithAnimation());
+        return comboBox;
+    }
+
+    // ========== DATA LOADING ==========
+    
+    /**
+     * Loads CSV data asynchronously with progress feedback
+     */
     private void loadCSVAsync(Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Climate Data CSV");
@@ -445,7 +467,6 @@ public class MainApp extends Application {
                     
                     configureYearAxis();
                     updateChartsWithAnimation();
-                    
                     applyCustomStyles(stage.getScene());
                     
                     hideLoading("Loaded " + data.size() + " records from " + loader.getCountries().size() + " countries", SUCCESS_GREEN);
@@ -459,17 +480,11 @@ public class MainApp extends Application {
         }
     }
 
-    private void showLoading(String message) {
-        statusLabel.setText(message);
-        loadingIndicator.setVisible(true);
-    }
-
-    private void hideLoading(String message, String color) {
-        loadingIndicator.setVisible(false);
-        statusLabel.setText(message);
-        statusLabel.setStyle("-fx-text-fill: " + color + "; -fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;");
-    }
-
+    // ========== CHART MANAGEMENT ==========
+    
+    /**
+     * Configures the year axis based on loaded data range
+     */
     private void configureYearAxis() {
         if (data == null || data.isEmpty()) return;
 
@@ -487,6 +502,9 @@ public class MainApp extends Application {
         updateYearRange();
     }
 
+    /**
+     * Updates the chart's year range based on slider values
+     */
     private void updateYearRange() {
         int minYear = (int) minYearSlider.getValue();
         int maxYear = (int) maxYearSlider.getValue();
@@ -505,11 +523,17 @@ public class MainApp extends Application {
         }
     }
 
+    /**
+     * Resets year sliders to full data range
+     */
     private void resetYearRange() {
         minYearSlider.setValue(globalMinYear);
         maxYearSlider.setValue(globalMaxYear);
     }
 
+    /**
+     * Updates charts with smooth fade animation
+     */
     private void updateChartsWithAnimation() {
         FadeTransition fadeOut = new FadeTransition(Duration.millis(200), lineChart);
         fadeOut.setFromValue(1.0);
@@ -524,6 +548,9 @@ public class MainApp extends Application {
         fadeOut.play();
     }
 
+    /**
+     * Main chart update method - refreshes all chart content
+     */
     private void updateCharts() {
         lineChart.getData().clear();
         statsContent.getChildren().clear();
@@ -553,6 +580,9 @@ public class MainApp extends Application {
         });
     }
 
+    /**
+     * Adds a country data series to the chart with interactive tooltips
+     */
     private void addCountrySeriesWithTooltips(String country, String color) {
         XYChart.Series<Number, Number> series = new XYChart.Series<>();
         series.setName(country);
@@ -560,6 +590,7 @@ public class MainApp extends Application {
         int minYear = (int) minYearSlider.getValue();
         int maxYear = (int) maxYearSlider.getValue();
 
+        // Add filtered data points
         for (DataRecord record : data) {
             if (record.getCountry().equals(country) && 
                 record.getYear() >= minYear && record.getYear() <= maxYear) {
@@ -586,7 +617,6 @@ public class MainApp extends Application {
                 "-fx-background-radius: 6;"
             );
             
-            // Install tooltip after node is created
             dataPoint.nodeProperty().addListener((obs, oldNode, newNode) -> {
                 if (newNode != null) {
                     Tooltip.install(newNode, tooltip);
@@ -595,6 +625,11 @@ public class MainApp extends Application {
         });
     }
 
+    // ========== STATISTICS AND COMPARISON ==========
+    
+    /**
+     * Updates the statistics panel with country data
+     */
     private void updateStatistics() {
         String country1 = countryBox1.getValue();
         String country2 = countryBox2.getValue();
@@ -613,8 +648,11 @@ public class MainApp extends Application {
         }
     }
 
+    /**
+     * Updates the quick comparison panel with country analysis
+     */
     private void updateComparisonPanel() {
-        // Clear existing comparison content (keep title)
+        // Clear existing content (keep title)
         comparisonPanel.getChildren().removeIf(node -> !(node instanceof Label && ((Label) node).getText().equals("Quick Comparison")));
 
         String country1 = countryBox1.getValue();
@@ -645,11 +683,16 @@ public class MainApp extends Application {
 
                 Label comparisonLabel = new Label(comparison);
                 comparisonLabel.setWrapText(true);
+                comparisonLabel.setPrefWidth(260);
+                comparisonLabel.setMaxWidth(260);
                 comparisonLabel.setStyle(
                     "-fx-text-fill: " + color + ";" +
-                    "-fx-font-size: 14px;" +
+                    "-fx-font-size: 13px;" +
                     "-fx-font-weight: bold;" +
-                    "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;"
+                    "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;" +
+                    "-fx-line-spacing: 2px;" +
+                    "-fx-padding: 5px;" +
+                    "-fx-text-alignment: left;"
                 );
 
                 // Peak information
@@ -681,23 +724,9 @@ public class MainApp extends Application {
         }
     }
 
-    private List<DataRecord> getFilteredCountryData(String country) {
-        int minYear = (int) minYearSlider.getValue();
-        int maxYear = (int) maxYearSlider.getValue();
-        
-        return data.stream()
-            .filter(record -> record.getCountry().equals(country) && 
-                    record.getYear() >= minYear && record.getYear() <= maxYear)
-            .toList();
-    }
-
-    private DoubleSummaryStatistics getCachedStats(String country, List<DataRecord> countryData) {
-        String cacheKey = country + "_" + (int)minYearSlider.getValue() + "_" + (int)maxYearSlider.getValue();
-        return statsCache.computeIfAbsent(cacheKey, k -> 
-            countryData.stream().mapToDouble(DataRecord::getEmission).summaryStatistics()
-        );
-    }
-
+    /**
+     * Adds detailed statistics for a country to the stats panel
+     */
     private void addCountryStatistics(String country) {
         List<DataRecord> countryData = getFilteredCountryData(country);
         if (countryData.isEmpty()) return;
@@ -742,6 +771,9 @@ public class MainApp extends Application {
         statsContent.getChildren().add(countryStats);
     }
 
+    /**
+     * Creates a formatted statistics label
+     */
     private HBox createStatLabel(String label, String value) {
         return createStatLabel(label, value, TEXT_PRIMARY);
     }
@@ -762,6 +794,34 @@ public class MainApp extends Application {
         return statBox;
     }
 
+    // ========== DATA UTILITIES ==========
+    
+    /**
+     * Gets filtered country data based on current year range
+     */
+    private List<DataRecord> getFilteredCountryData(String country) {
+        int minYear = (int) minYearSlider.getValue();
+        int maxYear = (int) maxYearSlider.getValue();
+        
+        return data.stream()
+            .filter(record -> record.getCountry().equals(country) && 
+                    record.getYear() >= minYear && record.getYear() <= maxYear)
+            .toList();
+    }
+
+    /**
+     * Gets cached statistics for performance on lower end computers, before i added this and looked into performance gains even my laptop was having a hard time rendering
+     */
+    private DoubleSummaryStatistics getCachedStats(String country, List<DataRecord> countryData) {
+        String cacheKey = country + "_" + (int)minYearSlider.getValue() + "_" + (int)maxYearSlider.getValue();
+        return statsCache.computeIfAbsent(cacheKey, k -> 
+            countryData.stream().mapToDouble(DataRecord::getEmission).summaryStatistics()
+        );
+    }
+
+    /**
+     * Calculates median value from data records
+     */
     private double calculateMedian(List<DataRecord> countryData) {
         List<Double> emissions = countryData.stream()
             .mapToDouble(DataRecord::getEmission)
@@ -778,6 +838,9 @@ public class MainApp extends Application {
         }
     }
 
+    /**
+     * Calculates standard deviation,
+     */
     private double calculateStdDev(List<DataRecord> countryData, double mean) {
         if (countryData.size() <= 1) return 0;
         
@@ -789,11 +852,38 @@ public class MainApp extends Application {
         return Math.sqrt(sumSquaredDiffs / (countryData.size() - 1));
     }
 
+    // ========== UI STATUS AND STYLING ==========
+    
+    /*
+     * turns out, you can use JavaFX with a pseudo-css style font and colour manager and because i already know CSS implementation is quite easy.
+     */
+
+
+    /**
+     * Shows loading state with progress indicator
+     */
+    private void showLoading(String message) {
+        statusLabel.setText(message);
+        loadingIndicator.setVisible(true);
+    }
+
+    /**
+     * Hides loading state and shows result message
+     */
+    private void hideLoading(String message, String color) {
+        loadingIndicator.setVisible(false);
+        statusLabel.setText(message);
+        statusLabel.setStyle("-fx-text-fill: " + color + "; -fx-font-size: 12px; -fx-font-weight: bold; -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;");
+    }
+
+    /**
+     * Applies custom dark theme styling to all components, it uses functionality from Css which is super cool because i already know it
+     */
     private void applyCustomStyles(Scene scene) {
         scene.getRoot().applyCss();
         scene.getRoot().layout();
         
-        // Style sliders after they're rendered
+        // Style sliders after rendering
         if (minYearSlider != null) {
             javafx.application.Platform.runLater(() -> {
                 styleSliderComponents(minYearSlider);
@@ -802,18 +892,12 @@ public class MainApp extends Application {
         }
         
         if (lineChart != null) {
-            lineChart.lookup(".chart").setStyle(
-                "-fx-background-color: " + CARD_BG + ";"
-            );
+            // Chart backgrounds
+            lineChart.lookup(".chart").setStyle("-fx-background-color: " + CARD_BG + ";");
+            lineChart.lookup(".chart-plot-background").setStyle("-fx-background-color: " + CARD_BG + ";");
+            lineChart.lookup(".chart-content").setStyle("-fx-padding: 20px;");
             
-            lineChart.lookup(".chart-plot-background").setStyle(
-                "-fx-background-color: " + CARD_BG + ";"
-            );
-            
-            lineChart.lookup(".chart-content").setStyle(
-                "-fx-padding: 20px;"
-            );
-            
+            // Chart text elements, sorts through font families, applies the ones i want and sets up backups if the user doesnt have the correct fonts.
             lineChart.lookup(".axis").setStyle(
                 "-fx-tick-label-fill: " + TEXT_PRIMARY + ";" +
                 "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;"
@@ -833,6 +917,7 @@ public class MainApp extends Application {
                 "-fx-font-weight: bold;"
             );
             
+            // Chart legend
             lineChart.lookup(".chart-legend").setStyle(
                 "-fx-background-color: " + SECONDARY_BG + ";" +
                 "-fx-border-color: " + BORDER_COLOR + ";" +
@@ -848,6 +933,7 @@ public class MainApp extends Application {
                 );
             });
             
+            // Grid lines on the graph (they got messed up when i tried changing the colour from white to black)
             lineChart.lookupAll(".chart-vertical-grid-lines").forEach(node -> {
                 node.setStyle("-fx-stroke: #404040;");
             });
@@ -857,7 +943,7 @@ public class MainApp extends Application {
             });
         }
         
-        // Style combo box dropdowns
+        // Combo box styling
         scene.getRoot().lookupAll(".combo-box-popup .list-view").forEach(node -> {
             node.setStyle(
                 "-fx-background-color: " + SECONDARY_BG + ";" +
@@ -876,10 +962,12 @@ public class MainApp extends Application {
             );
         });
     }
-    
+
+    /**
+     * Applies custom styling to slider components
+     */
     private void styleSliderComponents(Slider slider) {
         try {
-            // Style the slider track
             if (slider.lookup(".track") != null) {
                 slider.lookup(".track").setStyle(
                     "-fx-background-color: " + BORDER_COLOR + ";" +
@@ -888,7 +976,6 @@ public class MainApp extends Application {
                 );
             }
             
-            // Style the slider thumb
             if (slider.lookup(".thumb") != null) {
                 slider.lookup(".thumb").setStyle(
                     "-fx-background-color: " + ACCENT_BLUE + ";" +
@@ -902,10 +989,15 @@ public class MainApp extends Application {
                 );
             }
         } catch (Exception e) {
-            // Ignore styling errors and use defaults
+            // Ignore styling errors - use defaults
         }
     }
 
+    // ========== EXPORT FUNCTIONALITY ==========
+    
+    /**
+     * Exports the current chart as a PNG image
+     */
     private void exportChartAsPNG() {
         String filename = "climate_chart_" + String.format("%03d", exportCounter) + ".png";
         File file = new File(System.getProperty("user.home") + File.separator + "Downloads", filename);
@@ -923,6 +1015,8 @@ public class MainApp extends Application {
             hideLoading("Export failed: " + ex.getMessage(), ACCENT_ORANGE);
         }
     }
+
+
 
     public static void main(String[] args) {
         launch(args);
