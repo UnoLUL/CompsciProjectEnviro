@@ -9,8 +9,8 @@ Download the standalone application for your platform:
 | Platform | Download | Size |
 |----------|----------|------|
 | Windows 10+ | [Download for Windows](https://drive.google.com/file/d/1gHFn-17KF2v-46umNEsed0yVAa7bCxDh/view?usp=drive_link) | ~45MB |
-| macOS 10.14+ | [Download for macOS]((https://drive.google.com/file/d/1oUxbAMaVL5bf5UH-MKsxjNGRBSyljcEb/view?usp=sharing)) | ~50MB |
-| Linux (Ubuntu 18+) | [Download for Linux]((https://drive.google.com/file/d/1wTRH45wWiqXa4qUEWpiUfeqYJ_-MnsvP/view?usp=drive_link)) | ~48MB |
+| macOS 10.14+ | [Download for macOS](https://drive.google.com/file/d/1oUxbAMaVL5bf5UH-MKsxjNGRBSyljcEb/view?usp=sharing) | ~50MB |
+| Linux (Ubuntu 18+) | [Download for Linux](https://drive.google.com/file/d/1wTRH45wWiqXa4qUEWpiUfeqYJ_-MnsvP/view?usp=drive_link) | ~48MB |
 
 ### Installation Instructions
 
