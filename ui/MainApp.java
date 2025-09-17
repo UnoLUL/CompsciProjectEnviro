@@ -143,6 +143,9 @@ public class MainApp extends Application {
         lineChart.setCreateSymbols(true);
         lineChart.setStyle("-fx-background-color: " + CARD_BG + "; -fx-border-color: " + BORDER_COLOR + "; -fx-border-radius: 12; -fx-background-radius: 12;");
         
+        // Force dark theme on chart
+        lineChart.setAnimated(false);
+        
         VBox.setVgrow(lineChart, Priority.ALWAYS);
         container.getChildren().add(lineChart);
         
@@ -256,6 +259,22 @@ public class MainApp extends Application {
                 -fx-padding: 20px;
             }
             
+            .chart-vertical-grid-lines {
+                -fx-stroke: #404040;
+            }
+            
+            .chart-horizontal-grid-lines {
+                -fx-stroke: #404040;
+            }
+            
+            .chart-alternative-row-fill {
+                -fx-fill: transparent;
+            }
+            
+            .chart-alternative-column-fill {
+                -fx-fill: transparent;
+            }
+            
             .axis {
                 -fx-tick-label-fill: %s;
                 -fx-font-size: 11px;
@@ -281,6 +300,15 @@ public class MainApp extends Application {
                 -fx-padding: 10 0 0 0;
             }
             
+            .chart-legend-item-symbol {
+                -fx-background-color: transparent;
+            }
+            
+            .chart-legend-item {
+                -fx-text-fill: %s;
+                -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+            }
+            
             .scroll-pane {
                 -fx-background-color: transparent;
             }
@@ -299,7 +327,7 @@ public class MainApp extends Application {
             }
             """.formatted(
                 SECONDARY_BG, TEXT_PRIMARY, BORDER_COLOR, SECONDARY_BG, BORDER_COLOR,
-                PRIMARY_BG, PRIMARY_BG, TEXT_PRIMARY, TEXT_PRIMARY, TEXT_PRIMARY,
+                PRIMARY_BG, PRIMARY_BG, TEXT_PRIMARY, TEXT_PRIMARY, TEXT_PRIMARY, TEXT_PRIMARY,
                 SECONDARY_BG, BORDER_COLOR
             );
     }
