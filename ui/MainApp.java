@@ -34,7 +34,7 @@ public class MainApp extends Application {
 
     private List<EmissionRecord> data;
 
-    @Override
+    
     public void start(Stage primaryStage) {
         loader = new DataLoader();
         analyser = new DataAnalyser(loader);
@@ -167,7 +167,7 @@ public class MainApp extends Application {
             }
         }
     }
-
+    //exporting the chart as a png, it should be doing a snapshot of the lineChart
     private void exportChartAsPNG() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Chart as PNG");
@@ -194,6 +194,6 @@ public class MainApp extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        launch(args); // launches the program.
     }
 }
