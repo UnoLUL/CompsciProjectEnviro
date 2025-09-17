@@ -16,6 +16,8 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,7 @@ public class MainApp extends Application {
     private Button exportPngBtn;
 
     private List<EmissionRecord> data;
+    private int exportCounter = 1;
 
     @Override
     public void start(Stage primaryStage) {
@@ -169,19 +172,22 @@ public class MainApp extends Application {
     }
 
     private void exportChartAsPNG() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Chart as PNG");
-        fileChooser.setInitialFileName("chart.png");
-        File file = fileChooser.showSaveDialog(null);
-
-        if (file != null) {
-            try {
-                javafx.scene.image.WritableImage image = lineChart.snapshot(null, null);
-                ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-                showAlert("Export Successful", "Chart exported to " + file.getAbsolutePath());
-            } catch (IOException ex) {
-                showAlert("Export Failed", "Could not save PNG file.");
-            }
+        String filename = "chart_export_" + String.format("%03d", exportCounter) + ".png";
+        File file = new File(System.getProperty("user.home") + File.separator + "Downloads", filename);
+        
+        // Create Downloads directory if it doesn't exist
+        file.getParentFile().mkdirs();
+        
+        try {
+            javafx.scene.image.WritableImage image = lineChart.snapshot(null, null);
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+            
+            // Brief success notification
+            exportCounter++;
+            showAlert("Chart Saved", "Saved as: " + filename + "\nLocation: " + file.getParentFile().getAbsolutePath());
+            
+        } catch (IOException ex) {
+            showAlert("Export Failed", "Could not save PNG file: " + ex.getMessage());
         }
     }
 
