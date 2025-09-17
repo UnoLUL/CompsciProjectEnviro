@@ -30,11 +30,11 @@ public class MainApp extends Application {
     private BorderPane statsPanel;
     private VBox statsContent;
     private Button exportBtn;
-    private Button exportPngBtn; 
+    private Button exportPngBtn;
 
     private List<EmissionRecord> data;
 
-   
+    @Override
     public void start(Stage primaryStage) {
         loader = new DataLoader();
         analyser = new DataAnalyser(loader);
@@ -42,34 +42,17 @@ public class MainApp extends Application {
         // Controls
         Button loadBtn = new Button("Load CSV");
         loadBtn.setOnAction(e -> loadCSV(primaryStage));
-        loadBtn.setPrefWidth(100);
-
-        exportBtn = new Button("Export to CSV");
-        exportBtn.setOnAction(e -> exportData());
-        exportBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;");
-        exportBtn.setPrefWidth(120);
-
-        exportPngBtn = new Button("Export Chart as PNG");
-        exportPngBtn.setOnAction(e -> exportChartAsPNG());
-        exportPngBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
-        exportPngBtn.setPrefWidth(160);
 
         countryBox1 = new ComboBox<>();
         countryBox2 = new ComboBox<>();
         countryBox1.setPromptText("Select Country 1");
         countryBox2.setPromptText("Select Country 2");
-        countryBox1.setPrefWidth(160);
-        countryBox2.setPrefWidth(160);
+        countryBox1.setOnAction(e -> updateCharts());
+        countryBox2.setOnAction(e -> updateCharts());
 
-        // Prevent ComboBoxes from expanding and hiding buttons
-        HBox controls = new HBox(10, loadBtn, exportBtn, exportPngBtn, countryBox1, countryBox2);
+        // Controls HBox (top bar only has load + country selectors)
+        HBox controls = new HBox(10, loadBtn, countryBox1, countryBox2);
         controls.setPadding(new Insets(10));
-        controls.setPrefHeight(50);
-        HBox.setHgrow(loadBtn, Priority.NEVER);
-        HBox.setHgrow(exportBtn, Priority.NEVER);
-        HBox.setHgrow(exportPngBtn, Priority.NEVER);
-        HBox.setHgrow(countryBox1, Priority.NEVER);
-        HBox.setHgrow(countryBox2, Priority.NEVER);
 
         // Chart setup
         NumberAxis xAxis = new NumberAxis();
@@ -79,6 +62,13 @@ public class MainApp extends Application {
         lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle("Climate Data");
 
+        // Export buttons
+        exportBtn = new Button("Export to CSV");
+        exportBtn.setOnAction(e -> exportData());
+
+        exportPngBtn = new Button("Export Chart as PNG");
+        exportPngBtn.setOnAction(e -> exportChartAsPNG());
+
         // Stats panel setup
         statsPanel = new BorderPane();
         statsPanel.setPadding(new Insets(10));
@@ -87,13 +77,18 @@ public class MainApp extends Application {
         statsContent = new VBox(10);
         statsPanel.setCenter(statsContent);
 
-        // base layout
+        // put both export buttons at the bottom, side by side
+        HBox exportButtons = new HBox(10, exportBtn, exportPngBtn);
+        exportButtons.setPadding(new Insets(10, 0, 0, 0));
+        statsPanel.setBottom(exportButtons);
+
+        // Base layout
         BorderPane root = new BorderPane();
         root.setTop(controls);
         root.setCenter(lineChart);
         root.setRight(statsPanel);
 
-        Scene scene = new Scene(root, 900, 600);
+        Scene scene = new Scene(root, 1000, 600);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Climate Data Visualizer");
         primaryStage.show();
