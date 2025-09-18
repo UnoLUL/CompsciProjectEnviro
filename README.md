@@ -14,7 +14,7 @@ Download the standalone application for your platform:
 
 
 **IMPORTANT**
-the standalone installs do not come with the excel document i had in mind, if you would like to download the document i used for all the testing (~20k collums) i have put a link below
+the standalone installs do not come with the excel document i had in mind, if you would like to download the document i used for all the testing (~20k rows) i have put a link below
 
 | Type| Download | 
 |---------|---------| 
