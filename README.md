@@ -1,6 +1,6 @@
 # Climate Data Visualizer
 
-[This Java program allows users to easily view and disect Co2 emissions whenever they want]
+[This Java program allows users to easily view and disect Co2 emissions from a CSV file]
 
 ## Downloads
 
@@ -26,6 +26,10 @@ the standalone installs do not come with the excel document i had in mind, if yo
 **Windows**: Extract ZIP → Double-click `Climate-Data-Visualizer.bat`
 **macOS**: Extract ZIP → Drag app to Applications folder
 **Linux**: Extract TAR.GZ → Run `./climate-data-visualizer.sh`
+
+
+-to find out more, consult the offical [manual](https://docs.google.com/document/d/10Py-BVxa6Q8AZePI0iN2OhFsjDN-6pdl/edit?usp=drive_link&ouid=115662500140973273474&rtpof=true&sd=true)
+
 
 No additional software required (Java included).
 
