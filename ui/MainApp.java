@@ -301,7 +301,7 @@ public class MainApp extends Application {
     }
 
     /**
-     * Creates the bottom status bar with loading indicator
+     * Creates the bottom status bar with loading indicator,
      */
     private HBox createStatusBar() {
         HBox statusBar = new HBox();
