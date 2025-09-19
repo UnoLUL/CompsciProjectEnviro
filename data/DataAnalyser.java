@@ -9,7 +9,7 @@ public class DataAnalyser {
     public DataAnalyser(DataLoader loader) {
         this.loader = loader;
     }
-
+    // via some different java util imports i can pull the data from the excel spreadsheet (using the dataloader) and sort it into a better format.
     public Map<String, Double> getAverageEmissions() {
         return loader.getData().stream()
                 .collect(Collectors.groupingBy(

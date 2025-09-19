@@ -15,3 +15,6 @@ public class DataRecord {
     public int getYear() { return year; }
     public double getEmission() { return emission; }
 }
+
+
+//DataRecord has a some different methods that can be called by other programs to get different parts of the CSV file

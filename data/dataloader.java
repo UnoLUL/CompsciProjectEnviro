@@ -6,7 +6,10 @@ import java.util.*;
 public class DataLoader {
     private List<DataRecord> data = new ArrayList<>();
     private List<String> headers = new ArrayList<>();
-
+   /*The loadCSV method is used when the user clicks on the button in the program (the call is inside MainApp) and then
+    *  the data is cleared from anything previously being used and then it checks if the document is the correct format, puts it into an array
+    *  and then sets different variables (int , double) to the collums for later use.
+    */
     public void loadCSV(String path) throws IOException {
         data.clear();
         headers.clear();
@@ -25,7 +28,7 @@ public class DataLoader {
                 }
             }
         }
-    }
+    } 
 
     public List<DataRecord> getData() { return data; }
     public List<String> getHeaders() { return headers; }
