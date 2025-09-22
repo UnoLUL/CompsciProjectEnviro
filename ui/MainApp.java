@@ -905,7 +905,8 @@ public class MainApp extends Application {
             
             lineChart.lookupAll(".axis-label").forEach(node -> {
                 node.setStyle(
-                    "-fx-text-fill: " + TEXT_PRIMARY + ";" +
+                    "-fx-" +
+                    "text-fill: " + TEXT_PRIMARY + ";" +
                     "-fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;" +
                     "-fx-font-weight: bold;"
                 );
