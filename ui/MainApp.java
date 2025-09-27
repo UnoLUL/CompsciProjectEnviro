@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Climate Data Visualizer - A  data visualisation application
+ * Climate Data Visualiser - A  data visualisation application
  * for analysing and comparing CO2 emissions data across countries and time periods
  * the program allows users to select a csv file, then the program uses an algorithim i wrote to sort through all collums and get the raw data
  * afterwards it displays the data in graph format and allows the user to select the year periods and some basic or detailed stats depending on their 
@@ -92,7 +92,7 @@ public class MainApp extends Application {
         Scene scene = new Scene(createMainLayout(), 1600, 950);
         
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Climate Data Visualizer");
+        primaryStage.setTitle("Climate Data Visualiser");
         primaryStage.show();
         
         applyCustomStyles(scene);
@@ -137,7 +137,7 @@ public class MainApp extends Application {
         header.setSpacing(15);
 
         // Application title
-        Label title = new Label("Climate Data Visualizer");
+        Label title = new Label("Climate Data Visualiser");
         title.setStyle("-fx-text-fill: " + TEXT_PRIMARY + "; -fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;");
         
         // Main control bar
@@ -239,7 +239,7 @@ public class MainApp extends Application {
     }
 
     /**
-     * Creates the main chart container for data visualization
+     * Creates the main chart container for data visualisation
      */
     private VBox createChartContainer() {
         VBox container = new VBox();
